@@ -1,0 +1,35 @@
+name: Deploy Vite React to Hostinger
+
+on:
+  push:
+    branches:
+      - master  # Trigger the workflow on pushes to the master branch
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'  # Adjust if necessary
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build the project
+      run: npm run build
+
+    - name: Copy files via SSH
+      uses: appleboy/scp-action@v0.1.0
+      with:
+        host: api.onicbyte.com  # Replace with your Hostinger server IP or domain
+        username: "your_ssh_username"  # Replace with your SSH username
+        key: ${{ secrets.SSH_PRIVATE_KEY }}  # Use the SSH private key secret you added
+        port: 22  # Default SSH port
+        source: "dist/*"  # Source directory to upload (output of your build)
+        target: "/"  # Deploy to the root directory
